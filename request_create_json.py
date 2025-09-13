@@ -6,6 +6,10 @@ from make_png_from_dicom import change_to_png
 
 BASE_URL = "http://88.248.132.97:3333/lisapi/api/v1/Radiology/getPatientPacsImages"
 
+# Set a default path to a sample JSON file (update this path as needed)
+path = "received_data/patient_id_unknown/sample_patient.json"  # Default; replace with a real path if available
+patient_id = 0
+
 def get_patient(patient_id: int):
     """Fetch PACS image info for a given patient ID"""
     url = f"{BASE_URL}?patientId={patient_id}"
@@ -15,13 +19,13 @@ def get_patient(patient_id: int):
 
 def save_patient_data(data: dict, base_folder="received_data"):
     """Save patient JSON and all radiology images into patient folder"""
+    global path
 
     if "patient" not in data:
         print("No patient field in response")
         return None
 
     patient = data["patient"]
-
     pid = patient.get("id", "unknown")
     name = patient.get("name", "unknown").replace(" ", "_")
     surname = patient.get("surname", "unknown").replace(" ", "_")
@@ -30,9 +34,12 @@ def save_patient_data(data: dict, base_folder="received_data"):
     patient_folder = os.path.join(base_folder, f"patient_id_{pid}")
     os.makedirs(patient_folder, exist_ok=True)
 
-    # --- Save JSON ---
+    # Update the global path to the new JSON file
     json_filename = f"{name}_{surname}_id_{pid}.json"
     json_path = os.path.join(patient_folder, json_filename)
+    path = json_path  # Update global path
+
+    # --- Save JSON ---
     with open(json_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
     print(f"Saved patient JSON to {json_path}")
@@ -43,14 +50,11 @@ def save_patient_data(data: dict, base_folder="received_data"):
             for file_info in study.get("files", []):
                 file_name = file_info.get("fileName", "output.png")
                 file_data = file_info.get("fileData")
-
                 try:
                     file_bytes = base64.b64decode(file_data)
                     file_path = os.path.join(patient_folder, file_name)
-
                     with open(file_path, "wb") as img_file:
                         img_file.write(file_bytes)
-
                     print(f"Saved image: {file_path}")
                 except Exception as e:
                     print(f"Error saving {file_name}: {e}")
@@ -62,14 +66,12 @@ def save_patient_data(data: dict, base_folder="received_data"):
             print(f"Found {len(dcm_files)} DICOM files. Starting conversion...")
             change_to_png(pid)
             print("Conversion complete.")
-
     except Exception as e:
         print(f"Error converting DICOM files: {e}")
 
     return patient_folder
 
-
-def analyze_json(path: str, image: str):
+def analyze_json():
     """
     Open JSON file and return all data except 'radiologyImages'.
     """
@@ -81,21 +83,16 @@ def analyze_json(path: str, image: str):
 
     return result
 
-def analyze_description(description: str, question: str, result: dict):
 
-    return {
-        **result,
-        "description": description,
-        "question": question
-    }
-
-
-def setup(path = "health-assistant-ai-main\\first_text.txt"):
+def setup(path_to_instructions="first_text.txt"):
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path_to_instructions, "r", encoding="utf-8") as f:
             prompt = f.read().strip()
         return prompt
     except FileNotFoundError:
-        raise FileNotFoundError(f"Setup prompt file not found: {path}")
+        raise FileNotFoundError("")
     except Exception as e:
-        raise RuntimeError(f"Error reading setup prompt: {e}")
+        raise RuntimeError("")
+
+
+instructions = setup()

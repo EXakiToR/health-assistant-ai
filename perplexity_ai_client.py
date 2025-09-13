@@ -3,16 +3,46 @@ import json
 import base64
 import os
 from typing import Dict, Any
+import request_create_json as r
+import front as fr
 
 # Try to load .env file if python-dotenv is available
 try:
     from dotenv import load_dotenv
     load_dotenv()
 except ImportError:
-    # If python-dotenv is not installed, continue without it
+
     pass
 
+def analyze_description():
+
+    description = fr.self.entry_assumptions
+    question = fr.self.entry_questions
+    prompt = {
+        "requirements": r.instructions,
+        "patient_data": r.result,
+        "opinion": description,
+        "question": question
+    }
+    return prompt
+
+prompt = analyze_description()
+
+image = fr.self.selected_xray
+
+image_path = f"{r.path}_{image}"
+
+print(image_path)
+
+
+
+
+
+
 def send_to_perplexity_ai(input_dict: Dict[str, Any], image_path: str, custom_prompt: str = None) -> str:
+
+    print("ASCFWE: ", custom_prompt, "\n")
+
     """
     Send a dictionary and image to Perplexity AI API and return the response.
     
@@ -48,11 +78,11 @@ def send_to_perplexity_ai(input_dict: Dict[str, Any], image_path: str, custom_pr
     
     # Prepare the prompt
     if custom_prompt:
-        default_text = f"""{custom_prompt}\n\n
+        default_text = f"""{r.setup()}. \n{custom_prompt}\n\n
         You can use bullet points (-) and line breaks (\\n) for better readability, but avoid bold formatting (**).
         Input data: {json.dumps(input_dict, indent=2)}"""
     else:
-        default_text = f"Analyze this medical data and image. Provide a concise analysis in 4-5 sentences. You can use bullet points (-) and line breaks (\\n) for better readability, but avoid bold formatting (**). Input data: {json.dumps(input_dict, indent=2)}"
+        default_text = f"Analyze this medical data and image. Provide a concise analysis in a few sentences. You can use bullet points (-) and line breaks (\\n) for better readability, but avoid bold formatting (**). Input data: {json.dumps(input_dict, indent=2)}"
     
     # Prepare the request payload
     payload = {
@@ -62,13 +92,13 @@ def send_to_perplexity_ai(input_dict: Dict[str, Any], image_path: str, custom_pr
                 "role": "user",
                 "content": [
                     {
-                        "type": "text",
-                        "text": default_text
+                        r.prompt
                     },
+
                     {
                         "type": "image_url",
                         "image_url": {
-                            "url": f"data:image/jpeg;base64,{image_data}"
+                            "url": f"received_data\\patient_id_{1}"
                         }
                     }
                 ]
@@ -128,29 +158,7 @@ def example_usage():
     """
     # Example input dictionary
     sample_data = {
-        "patient_id": 12345,
-        "patient_name": "John Doe",
-        "age": 45,
-        "info": """Pacient: X 
-                Data: 05.08.2025
-                Data nasterii: 15.07.1967 Vîrsta: 58 a.
-
-                Radiografie digital a mainii bilateral(1 incidenta)
-
-                Descriere Radiografie
-                GE Healthcare Proteus XR/F DAP: 0.39 mGycm2
-                Osteoporoza epifizara, juxtaarticulara bilateral, simetric, cu desen trabecular pastrat.
-                Spatiile articulare in articulatiile radio- carpiene pe dreapta , metacarpo-falangiene si interfalangiene
-                proximale si distale – reduse, cu scleroza subcondrala la nivelul suprafetelor articulare.
-                Formatiuni productive pronuntate si osteofitoza pe contururile laterale si mediale a articulatiilor
-                interfalangiene distale.
-                Multiple formatiuni chistice in oasele carpiene, epifizele metacarpieneleor si falangiene bilateral.
-                Formatiuni productive incipiente pe contururile laterale si mediale a articulatiilor metacarpofalangiene
-                , interfalangiene proximale si distale.
-                Concluzie Rx : Semne radiologice indirecte de artropatie seronegativa nediferentiata posibil
-                reactiva (de exclus focar cronic de infectie) – necesita evaluare in context clinic si de
-                laborator / DD artrita seronegative psoriazica. Osteoartrita deformanta
-                degenerativa articulațiilor interfalangiene distale, proximale si metacarpo-falangiene.""",
+        "info": """hello""",
     }
     
     # Example image path (replace with actual image path)
@@ -158,7 +166,7 @@ def example_usage():
     
     try:
         # Example with custom prompt
-        custom_instruction = "Focus on the bone structure and joint spaces. Identify any abnormalities or conditions visible in the X-ray."
+        custom_instruction = "What is my name?"
         result = send_to_perplexity_ai(sample_data, image_path, custom_instruction)
         
         print("AI Analysis Result:")
