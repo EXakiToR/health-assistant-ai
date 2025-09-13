@@ -29,18 +29,16 @@ def dicom_to_png(input_folder, output_folder):
             except Exception as e:
                 print(f"Could not convert {filename}: {e}")
 
-def path(folder = "received_data\\"):
-    name = input("Enter id: ")
-    full_name = f"{folder}patient_id_{name}"
+def path(folder, id):
+    full_name = f"{folder}patient_id_{id}"
+    print(full_name)
     try:
         return full_name
     except Exception as e:
         print("File was not succesfully found", e)
 
-if __name__ == "__main__":
-    input_folder = "dicom_files"       # change this to your DICOM folder
-    output_folder = "dicom_png_output" # folder for PNGs
-    input_folder = path()
+def change_to_png(id):
+    input_folder = path("received_data\\", id)
     if os.path.exists(input_folder):
         dicom_to_png(input_folder, output_folder = input_folder)
     else:
