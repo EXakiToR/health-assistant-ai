@@ -2,9 +2,7 @@ import requests
 import json
 import base64
 import os
-from typing import Dict, Any, Union
-from PIL import Image
-import io
+from typing import Dict, Any
 
 # Try to load .env file if python-dotenv is available
 try:
@@ -50,20 +48,22 @@ def send_to_perplexity_ai(input_dict: Dict[str, Any], image_path: str, custom_pr
     
     # Prepare the prompt
     if custom_prompt:
-        prompt_text = f"{custom_prompt}\n\nInput data: {json.dumps(input_dict, indent=2)}"
+        default_text = f"""{custom_prompt}\n\n
+        You can use bullet points (-) and line breaks (\\n) for better readability, but avoid bold formatting (**).
+        Input data: {json.dumps(input_dict, indent=2)}"""
     else:
-        prompt_text = f"Analyze this medical data and image. Provide a concise analysis in 4-5 sentences. You can use bullet points (-) and line breaks (\\n) for better readability, but avoid bold formatting (**). Input data: {json.dumps(input_dict, indent=2)}"
+        default_text = f"Analyze this medical data and image. Provide a concise analysis in 4-5 sentences. You can use bullet points (-) and line breaks (\\n) for better readability, but avoid bold formatting (**). Input data: {json.dumps(input_dict, indent=2)}"
     
     # Prepare the request payload
     payload = {
-        "model": "sonar",  # Perplexity's latest model
+        "model": "sonar",  # Perplexity's lowest cost model
         "messages": [
             {
                 "role": "user",
                 "content": [
                     {
                         "type": "text",
-                        "text": prompt_text
+                        "text": default_text
                     },
                     {
                         "type": "image_url",
@@ -74,7 +74,7 @@ def send_to_perplexity_ai(input_dict: Dict[str, Any], image_path: str, custom_pr
                 ]
             }
         ],
-        "max_tokens": 400,
+        "max_tokens": 1000,
         "temperature": 0.1
     }
     
@@ -100,107 +100,12 @@ def send_to_perplexity_ai(input_dict: Dict[str, Any], image_path: str, custom_pr
         # Extract the AI's text response
         ai_text = ai_response['choices'][0]['message']['content']
         
-        # Clean up the response to remove only bold formatting while keeping bullet points and line breaks
+        # Clean up the response to remove formatting and references while keeping bullet points and line breaks
         import re
-        # Remove only bold formatting, keep bullet points and line breaks
-        ai_text = re.sub(r'\*\*(.*?)\*\*', r'\1', ai_text)  # Remove bold formatting
-        # Only replace multiple spaces that are not followed by newlines
-        ai_text = re.sub(r'[ \t]+', ' ', ai_text)  # Replace multiple spaces/tabs with single space
-        ai_text = ai_text.strip()
-        
-        # Return just the cleaned string response
-        return ai_text
-        
-    except requests.exceptions.RequestException as e:
-        raise requests.RequestException(f"API request failed: {e}")
-    except KeyError as e:
-        raise ValueError(f"Unexpected API response format: {e}")
-    except Exception as e:
-        raise Exception(f"Unexpected error: {e}")
-
-
-def send_to_perplexity_ai_with_pil_image(input_dict: Dict[str, Any], pil_image: Image.Image, custom_prompt: str = None) -> str:
-    """
-    Send a dictionary and PIL Image object to Perplexity AI API and return the response.
-    
-    Args:
-        input_dict (Dict[str, Any]): Dictionary containing input data to send to AI
-        pil_image (PIL.Image.Image): PIL Image object to send
-        custom_prompt (str, optional): Custom instructions for how to process the data and image
-        
-    Returns:
-        str: Cleaned AI response as a plain string
-    """
-    
-    # Get API key from environment variable
-    api_key = os.getenv('PERPLEXITY_API_KEY')
-    if not api_key:
-        raise ValueError("PERPLEXITY_API_KEY environment variable not set")
-    
-    # Convert PIL image to base64
-    try:
-        buffer = io.BytesIO()
-        pil_image.save(buffer, format='JPEG')
-        image_data = base64.b64encode(buffer.getvalue()).decode('utf-8')
-    except Exception as e:
-        raise ValueError(f"Error converting PIL image to base64: {e}")
-    
-    # Prepare the prompt
-    if custom_prompt:
-        prompt_text = f"{custom_prompt}\n\nInput data: {json.dumps(input_dict, indent=2)}"
-    else:
-        prompt_text = f"Analyze this medical data and image. Provide a concise analysis in 4-5 sentences. You can use bullet points (-) and line breaks (\\n) for better readability, but avoid bold formatting (**). Input data: {json.dumps(input_dict, indent=2)}"
-    
-    # Prepare the request payload
-    payload = {
-        "model": "sonar",
-        "messages": [
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "text",
-                        "text": prompt_text
-                    },
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": f"data:image/jpeg;base64,{image_data}"
-                        }
-                    }
-                ]
-            }
-        ],
-        "max_tokens": 400,
-        "temperature": 0.1
-    }
-    
-    # Set up headers
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
-    
-    # Make the API request
-    try:
-        response = requests.post(
-            "https://api.perplexity.ai/chat/completions",
-            headers=headers,
-            json=payload,
-            timeout=30
-        )
-        response.raise_for_status()
-        
-        # Parse the response
-        ai_response = response.json()
-        
-        # Extract the AI's text response
-        ai_text = ai_response['choices'][0]['message']['content']
-        
-        # Clean up the response to remove only bold formatting while keeping bullet points and line breaks
-        import re
-        # Remove only bold formatting, keep bullet points and line breaks
-        ai_text = re.sub(r'\*\*(.*?)\*\*', r'\1', ai_text)  # Remove bold formatting
+        # Remove bold formatting
+        ai_text = re.sub(r'\*\*(.*?)\*\*', r'\1', ai_text)
+        # Remove reference numbers in square brackets like [2][3][4]
+        ai_text = re.sub(r'\[\d+\]', '', ai_text)
         # Only replace multiple spaces that are not followed by newlines
         ai_text = re.sub(r'[ \t]+', ' ', ai_text)  # Replace multiple spaces/tabs with single space
         ai_text = ai_text.strip()
