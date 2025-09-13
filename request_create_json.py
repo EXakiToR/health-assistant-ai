@@ -2,6 +2,7 @@ import requests
 import json
 import os
 import base64
+from make_png_from_dicom import change_to_png
 
 BASE_URL = "http://88.248.132.97:3333/lisapi/api/v1/Radiology/getPatientPacsImages"
 
@@ -54,7 +55,19 @@ def save_patient_data(data: dict, base_folder="received_data"):
                 except Exception as e:
                     print(f"Error saving {file_name}: {e}")
 
+    # --- Convert DICOM to PNG if needed ---
+    try:
+        dcm_files = [f for f in os.listdir(patient_folder) if f.lower().endswith(".dcm")]
+        if dcm_files:
+            print(f"Found {len(dcm_files)} DICOM files. Starting conversion...")
+            change_to_png(pid)
+            print("Conversion complete.")
+
+    except Exception as e:
+        print(f"Error converting DICOM files: {e}")
+
     return patient_folder
+
 
 def analyze_json(path: str, image: str):
     """
@@ -62,22 +75,27 @@ def analyze_json(path: str, image: str):
     """
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
-#sdfef
+
     # Copy everything except "radiologyImages"
     result = {k: v for k, v in data.items() if k != "radiologyImages"}
 
     return result
 
-def analyze_description():
-    return
+def analyze_description(description: str, question: str, result: dict):
 
-def analyze_input():
-    return
+    return {
+        **result,
+        "description": description,
+        "question": question
+    }
 
-def main(xray):
 
-    if xray == True:
-        analyze_input()
-    
-    else:
-        analyze_input()
+def setup(path = "health-assistant-ai-main\\first_text.txt"):
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            prompt = f.read().strip()
+        return prompt
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Setup prompt file not found: {path}")
+    except Exception as e:
+        raise RuntimeError(f"Error reading setup prompt: {e}")
