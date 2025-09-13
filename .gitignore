@@ -1,3 +1,4 @@
-received_data/
-info/
+**/received_data/
+**/info/
+**/__pycache__/
 .env
