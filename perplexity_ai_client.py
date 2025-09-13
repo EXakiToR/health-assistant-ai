@@ -14,16 +14,17 @@ except ImportError:
     # If python-dotenv is not installed, continue without it
     pass
 
-def send_to_perplexity_ai(input_dict: Dict[str, Any], image_path: str) -> Dict[str, Any]:
+def send_to_perplexity_ai(input_dict: Dict[str, Any], image_path: str, custom_prompt: str = None) -> str:
     """
     Send a dictionary and image to Perplexity AI API and return the response.
     
     Args:
         input_dict (Dict[str, Any]): Dictionary containing input data to send to AI
         image_path (str): Path to the image file to send
+        custom_prompt (str, optional): Custom instructions for how to process the data and image
         
     Returns:
-        Dict[str, Any]: Dictionary containing the AI response merged with original input
+        str: Cleaned AI response as a plain string
         
     Raises:
         FileNotFoundError: If image file doesn't exist
@@ -47,6 +48,12 @@ def send_to_perplexity_ai(input_dict: Dict[str, Any], image_path: str) -> Dict[s
     except Exception as e:
         raise ValueError(f"Error reading image file: {e}")
     
+    # Prepare the prompt
+    if custom_prompt:
+        prompt_text = f"{custom_prompt}\n\nInput data: {json.dumps(input_dict, indent=2)}"
+    else:
+        prompt_text = f"Analyze this medical data and image. Provide a concise analysis in 4-5 sentences. You can use bullet points (-) and line breaks (\\n) for better readability, but avoid bold formatting (**). Input data: {json.dumps(input_dict, indent=2)}"
+    
     # Prepare the request payload
     payload = {
         "model": "sonar",  # Perplexity's latest model
@@ -56,7 +63,7 @@ def send_to_perplexity_ai(input_dict: Dict[str, Any], image_path: str) -> Dict[s
                 "content": [
                     {
                         "type": "text",
-                        "text": f"Please analyze this medical data and image. Input data: {json.dumps(input_dict, indent=2)}"
+                        "text": prompt_text
                     },
                     {
                         "type": "image_url",
@@ -67,8 +74,8 @@ def send_to_perplexity_ai(input_dict: Dict[str, Any], image_path: str) -> Dict[s
                 ]
             }
         ],
-        "max_tokens": 1000,
-        "temperature": 0.2
+        "max_tokens": 400,
+        "temperature": 0.1
     }
     
     # Set up headers
@@ -93,16 +100,16 @@ def send_to_perplexity_ai(input_dict: Dict[str, Any], image_path: str) -> Dict[s
         # Extract the AI's text response
         ai_text = ai_response['choices'][0]['message']['content']
         
-        # Create the output dictionary by merging input with AI response
-        output_dict = input_dict.copy()
-        output_dict['ai_analysis'] = ai_text
-        output_dict['ai_response_metadata'] = {
-            'model': ai_response.get('model'),
-            'usage': ai_response.get('usage'),
-            'created': ai_response.get('created')
-        }
+        # Clean up the response to remove only bold formatting while keeping bullet points and line breaks
+        import re
+        # Remove only bold formatting, keep bullet points and line breaks
+        ai_text = re.sub(r'\*\*(.*?)\*\*', r'\1', ai_text)  # Remove bold formatting
+        # Only replace multiple spaces that are not followed by newlines
+        ai_text = re.sub(r'[ \t]+', ' ', ai_text)  # Replace multiple spaces/tabs with single space
+        ai_text = ai_text.strip()
         
-        return output_dict
+        # Return just the cleaned string response
+        return ai_text
         
     except requests.exceptions.RequestException as e:
         raise requests.RequestException(f"API request failed: {e}")
@@ -112,16 +119,17 @@ def send_to_perplexity_ai(input_dict: Dict[str, Any], image_path: str) -> Dict[s
         raise Exception(f"Unexpected error: {e}")
 
 
-def send_to_perplexity_ai_with_pil_image(input_dict: Dict[str, Any], pil_image: Image.Image) -> Dict[str, Any]:
+def send_to_perplexity_ai_with_pil_image(input_dict: Dict[str, Any], pil_image: Image.Image, custom_prompt: str = None) -> str:
     """
     Send a dictionary and PIL Image object to Perplexity AI API and return the response.
     
     Args:
         input_dict (Dict[str, Any]): Dictionary containing input data to send to AI
         pil_image (PIL.Image.Image): PIL Image object to send
+        custom_prompt (str, optional): Custom instructions for how to process the data and image
         
     Returns:
-        Dict[str, Any]: Dictionary containing the AI response merged with original input
+        str: Cleaned AI response as a plain string
     """
     
     # Get API key from environment variable
@@ -137,6 +145,12 @@ def send_to_perplexity_ai_with_pil_image(input_dict: Dict[str, Any], pil_image: 
     except Exception as e:
         raise ValueError(f"Error converting PIL image to base64: {e}")
     
+    # Prepare the prompt
+    if custom_prompt:
+        prompt_text = f"{custom_prompt}\n\nInput data: {json.dumps(input_dict, indent=2)}"
+    else:
+        prompt_text = f"Analyze this medical data and image. Provide a concise analysis in 4-5 sentences. You can use bullet points (-) and line breaks (\\n) for better readability, but avoid bold formatting (**). Input data: {json.dumps(input_dict, indent=2)}"
+    
     # Prepare the request payload
     payload = {
         "model": "sonar",
@@ -146,7 +160,7 @@ def send_to_perplexity_ai_with_pil_image(input_dict: Dict[str, Any], pil_image: 
                 "content": [
                     {
                         "type": "text",
-                        "text": f"Please analyze this medical data and image. Input data: {json.dumps(input_dict, indent=2)}"
+                        "text": prompt_text
                     },
                     {
                         "type": "image_url",
@@ -157,8 +171,8 @@ def send_to_perplexity_ai_with_pil_image(input_dict: Dict[str, Any], pil_image: 
                 ]
             }
         ],
-        "max_tokens": 1000,
-        "temperature": 0.2
+        "max_tokens": 400,
+        "temperature": 0.1
     }
     
     # Set up headers
@@ -183,16 +197,16 @@ def send_to_perplexity_ai_with_pil_image(input_dict: Dict[str, Any], pil_image: 
         # Extract the AI's text response
         ai_text = ai_response['choices'][0]['message']['content']
         
-        # Create the output dictionary by merging input with AI response
-        output_dict = input_dict.copy()
-        output_dict['ai_analysis'] = ai_text
-        output_dict['ai_response_metadata'] = {
-            'model': ai_response.get('model'),
-            'usage': ai_response.get('usage'),
-            'created': ai_response.get('created')
-        }
+        # Clean up the response to remove only bold formatting while keeping bullet points and line breaks
+        import re
+        # Remove only bold formatting, keep bullet points and line breaks
+        ai_text = re.sub(r'\*\*(.*?)\*\*', r'\1', ai_text)  # Remove bold formatting
+        # Only replace multiple spaces that are not followed by newlines
+        ai_text = re.sub(r'[ \t]+', ' ', ai_text)  # Replace multiple spaces/tabs with single space
+        ai_text = ai_text.strip()
         
-        return output_dict
+        # Return just the cleaned string response
+        return ai_text
         
     except requests.exceptions.RequestException as e:
         raise requests.RequestException(f"API request failed: {e}")
@@ -238,11 +252,12 @@ def example_usage():
     image_path = "received_data/1.png"
     
     try:
-        # Send to Perplexity AI
-        result = send_to_perplexity_ai(sample_data, image_path)
+        # Example with custom prompt
+        custom_instruction = "Focus on the bone structure and joint spaces. Identify any abnormalities or conditions visible in the X-ray."
+        result = send_to_perplexity_ai(sample_data, image_path, custom_instruction)
         
         print("AI Analysis Result:")
-        print(json.dumps(result, indent=2))
+        print(result)  # Now prints just the string
         
         return result
         
@@ -254,3 +269,4 @@ def example_usage():
 if __name__ == "__main__":
     # Run example if script is executed directly
     example_usage()
+    # print("test\ntest\ntest")
