@@ -68,16 +68,22 @@ def analyze_json(path: str, image: str):
 
     return result
 
-def analyze_description():
-    return
+def analyze_description(description: str, question: str, result: dict):
 
-def analyze_input():
-    return
+    return {
+        **result,
+        "description": description,
+        "question": question
+    }
 
-def main(xray):
+#dwawd
+def setup(path = "health-assistant-ai-main\\first_text.txt"):
 
-    if xray == True:
-        analyze_input()
-    
-    else:
-        analyze_input()
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            prompt = f.read().strip()
+        return prompt
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Setup prompt file not found: {path}")
+    except Exception as e:
+        raise RuntimeError(f"Error reading setup prompt: {e}")
