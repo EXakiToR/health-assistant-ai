@@ -55,3 +55,29 @@ def save_patient_data(data: dict, base_folder="received_data"):
                     print(f"Error saving {file_name}: {e}")
 
     return patient_folder
+
+def analyze_json(path: str, image: str):
+    """
+    Open JSON file and return all data except 'radiologyImages'.
+    """
+    with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    # Copy everything except "radiologyImages"
+    result = {k: v for k, v in data.items() if k != "radiologyImages"}
+
+    return result
+
+def analyze_description():
+    return
+
+def analyze_input():
+    return
+
+def main(xray):
+
+    if xray == True:
+        analyze_input()
+    
+    else:
+        analyze_input()

@@ -1,0 +1,18 @@
+Pacient: X
+Data: 02.08.2025
+Data nasterii: 26.09.1982 Vîrsta: 42 a.
+
+Radiografia articulației genunchiului bilateral, în doua incidențe
+
+Descriere Radiografie
+GE Healthcare Proteus XR/F DAP: 26.83 mGycm2
+Spatiul articular ingustat medial bilateral mai pronuntat pe dreapta.
+Scleroza placilor subcondrale tibiale mediale, mai pronuntat pe stinga.
+Ascutirea eminentelor intercondilare bilateral, mai evident pe dreapta.
+Suprafetele articulare cu tendinte spre alungire.
+In profil lateral - formatiuni productive pe conturul superior si posterior, scleroza subcondrala.
+
+Concluzie Rx:
+Semne radiologice caracteristice pentru artrit-artroza gr. II (Kellgren-Lawerence). Artroza femuropatelara.
+Se recomanda USG art. genunchilor pentru evaluarea aparatului ligamentar, meniscurilor,
+cartilajului articular.
