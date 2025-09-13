@@ -62,7 +62,7 @@ def analyze_json(path: str, image: str):
     """
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
-
+#sdfef
     # Copy everything except "radiologyImages"
     result = {k: v for k, v in data.items() if k != "radiologyImages"}
 
