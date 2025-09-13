@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Clinical Assessment Engine</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+        }
+        .feature-card {
+            transition: transform 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .assessment-form {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        .result-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .confidence-bar {
+            height: 20px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #ff6b6b, #feca57, #48dbfb, #0abde3);
+        }
+        .loading {
+            display: none;
+        }
+        .error-message {
+            display: none;
+            color: #dc3545;
+        }
+        .success-message {
+            display: none;
+            color: #28a745;
+        }
+        .diagnosis-item {
+            border-left: 4px solid #007bff;
+            padding-left: 1rem;
+            margin: 0.5rem 0;
+        }
+        .finding-item {
+            background: #e9ecef;
+            padding: 0.5rem;
+            margin: 0.25rem 0;
+            border-radius: 5px;
+        }
+        .urgency-high {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .urgency-medium {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        .urgency-low {
+            color: #28a745;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-stethoscope me-2"></i>
+                AI Clinical Assessment Engine
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#assessment">Assessment</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#api">API Docs</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container text-center">
+            <h1 class="display-4 mb-4">AI-Powered Clinical Assessment</h1>
+            <p class="lead mb-4">Advanced diagnostic support system integrating with Beden Healthcare Systems and InVitro Diagnostics</p>
+            <p class="mb-4">FHIR R4 compliant • ICD-10 & SNOMED-CT integrated • Explainable AI • HIMSS Stage 6-7 ready</p>
+            <a href="#assessment" class="btn btn-light btn-lg">Start Assessment</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Key Features</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-brain fa-3x text-primary mb-3"></i>
+                            <h5 class="card-title">AI-Powered Analysis</h5>
+                            <p class="card-text">Advanced machine learning algorithms analyze patient data and radiology images to provide diagnostic insights.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-file-medical fa-3x text-success mb-3"></i>
+                            <h5 class="card-title">FHIR R4 Compliance</h5>
+                            <p class="card-text">Full FHIR R4 compliance ensures seamless integration with existing healthcare systems and workflows.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-search fa-3x text-info mb-3"></i>
+                            <h5 class="card-title">Explainable AI</h5>
+                            <p class="card-text">Transparent decision-making process with detailed explanations of diagnostic reasoning and confidence scores.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-code fa-3x text-warning mb-3"></i>
+                            <h5 class="card-title">ICD-10 & SNOMED-CT</h5>
+                            <p class="card-text">Integrated medical coding systems for accurate diagnosis classification and terminology standardization.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-x-ray fa-3x text-danger mb-3"></i>
+                            <h5 class="card-title">Radiology Analysis</h5>
+                            <p class="card-text">AI-powered analysis of radiology images including X-rays, CT scans, and MRI studies.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-shield-alt fa-3x text-secondary mb-3"></i>
+                            <h5 class="card-title">HIMSS Ready</h5>
+                            <p class="card-text">Designed to meet HIMSS Stage 6-7 requirements for clinical decision support and interoperability.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Assessment Section -->
+    <section id="assessment" class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5">Clinical Assessment</h2>
+            
+            <!-- Assessment Form -->
+            <div class="assessment-form">
+                <h4 class="mb-4">
+                    <i class="fas fa-user-md me-2"></i>
+                    Patient Assessment Request
+                </h4>
+                <form id="assessmentForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="patientId" class="form-label">Patient ID</label>
+                            <input type="number" class="form-control" id="patientId" required min="1" placeholder="Enter patient ID">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="assessmentType" class="form-label">Assessment Type</label>
+                            <select class="form-select" id="assessmentType">
+                                <option value="comprehensive">Comprehensive Assessment</option>
+                                <option value="focused">Focused Assessment</option>
+                                <option value="emergency">Emergency Assessment</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="includeRadiology" checked>
+                            <label class="form-check-label" for="includeRadiology">
+                                Include Radiology Analysis
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-play me-2"></i>
+                        Start Assessment
+                    </button>
+                </form>
+                
+                <!-- Loading Indicator -->
+                <div id="loading" class="loading text-center mt-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Processing assessment...</p>
+                </div>
+                
+                <!-- Error Message -->
+                <div id="errorMessage" class="error-message alert alert-danger mt-3">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <span id="errorText"></span>
+                </div>
+                
+                <!-- Success Message -->
+                <div id="successMessage" class="success-message alert alert-success mt-3">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Assessment completed successfully!
+                </div>
+            </div>
+            
+            <!-- Assessment Results -->
+            <div id="assessmentResults" class="mt-4" style="display: none;">
+                <h4 class="mb-4">
+                    <i class="fas fa-clipboard-list me-2"></i>
+                    Assessment Results
+                </h4>
+                
+                <!-- Assessment Summary -->
+                <div class="result-card">
+                    <h5>Assessment Summary</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Assessment ID:</strong> <span id="assessmentId"></span></p>
+                            <p><strong>Patient ID:</strong> <span id="resultPatientId"></span></p>
+                            <p><strong>Timestamp:</strong> <span id="assessmentTimestamp"></span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Confidence Score:</strong> <span id="confidenceScore"></span></p>
+                            <p><strong>Urgency Level:</strong> <span id="urgencyLevel"></span></p>
+                            <p><strong>Processing Time:</strong> <span id="processingTime"></span>s</p>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label">Overall Confidence</label>
+                        <div class="progress">
+                            <div id="confidenceBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Primary Diagnosis -->
+                <div id="primaryDiagnosis" class="result-card" style="display: none;">
+                    <h5>Primary Diagnosis</h5>
+                    <div id="primaryDiagnosisContent"></div>
+                </div>
+                
+                <!-- Differential Diagnoses -->
+                <div id="differentialDiagnoses" class="result-card" style="display: none;">
+                    <h5>Differential Diagnoses</h5>
+                    <div id="differentialDiagnosesContent"></div>
+                </div>
+                
+                <!-- Clinical Findings -->
+                <div id="clinicalFindings" class="result-card" style="display: none;">
+                    <h5>Clinical Findings</h5>
+                    <div id="clinicalFindingsContent"></div>
+                </div>
+                
+                <!-- Recommendations -->
+                <div id="recommendations" class="result-card" style="display: none;">
+                    <h5>Recommendations</h5>
+                    <div id="recommendationsContent"></div>
+                </div>
+                
+                <!-- Explainable AI -->
+                <div id="explainableAI" class="result-card" style="display: none;">
+                    <h5>AI Decision Process</h5>
+                    <div id="explainableAIContent"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Documentation Section -->
+    <section id="api" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">API Documentation</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Endpoints</h4>
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            POST /api/v1/assessment
+                            <span class="badge bg-primary rounded-pill">Assessment</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            GET /api/v1/patient/{id}
+                            <span class="badge bg-info rounded-pill">Patient Data</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            GET /api/v1/icd10/search
+                            <span class="badge bg-success rounded-pill">ICD-10</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            GET /api/v1/snomed/search
+                            <span class="badge bg-warning rounded-pill">SNOMED-CT</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h4>Integration</h4>
+                    <div class="card">
+                        <div class="card-body">
+                            <h6>Beden Healthcare API</h6>
+                            <p class="card-text small">Integrated with Beden Healthcare Systems for patient data retrieval and radiology image analysis.</p>
+                            
+                            <h6>FHIR R4 Compliance</h6>
+                            <p class="card-text small">Full FHIR R4 compliance for seamless healthcare system integration.</p>
+                            
+                            <h6>HIMSS Stage 6-7</h6>
+                            <p class="card-text small">Designed to meet HIMSS Stage 6-7 requirements for clinical decision support.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <a href="/api/docs" class="btn btn-outline-primary" target="_blank">
+                    <i class="fas fa-book me-2"></i>
+                    View Full API Documentation
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4">
+        <div class="container text-center">
+            <p>&copy; 2024 AI Clinical Assessment Engine. HealthTech Challenge - Beden Grup Healthcare Systems & InVitro Diagnostics</p>
+            <p class="small">Powered by FastAPI, FHIR R4, ICD-10, SNOMED-CT, and Explainable AI</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('assessmentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const patientId = document.getElementById('patientId').value;
+            const assessmentType = document.getElementById('assessmentType').value;
+            const includeRadiology = document.getElementById('includeRadiology').checked;
+            
+            // Show loading, hide other messages
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('assessmentResults').style.display = 'none';
+            
+            try {
+                const response = await fetch('/api/v1/assessment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        patient_id: parseInt(patientId),
+                        assessment_type: assessmentType,
+                        include_radiology: includeRadiology
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Assessment failed');
+                }
+                
+                const data = await response.json();
+                
+                // Hide loading, show success
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+                
+                // Display results
+                displayAssessmentResults(data);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('errorText').textContent = error.message;
+            }
+        });
+        
+        function displayAssessmentResults(data) {
+            // Show results section
+            document.getElementById('assessmentResults').style.display = 'block';
+            
+            // Basic info
+            document.getElementById('assessmentId').textContent = data.assessment_id;
+            document.getElementById('resultPatientId').textContent = data.patient_id;
+            document.getElementById('assessmentTimestamp').textContent = new Date(data.timestamp).toLocaleString();
+            document.getElementById('confidenceScore').textContent = (data.confidence_score * 100).toFixed(1) + '%';
+            document.getElementById('urgencyLevel').textContent = data.assessment_result.urgency_level;
+            document.getElementById('processingTime').textContent = data.assessment_result.processing_time || 'N/A';
+            
+            // Confidence bar
+            const confidencePercent = data.confidence_score * 100;
+            document.getElementById('confidenceBar').style.width = confidencePercent + '%';
+            document.getElementById('confidenceBar').textContent = confidencePercent.toFixed(1) + '%';
+            
+            // Urgency level styling
+            const urgencyElement = document.getElementById('urgencyLevel');
+            urgencyElement.className = 'urgency-' + data.assessment_result.urgency_level;
+            
+            // Primary diagnosis
+            if (data.assessment_result.primary_diagnosis) {
+                document.getElementById('primaryDiagnosis').style.display = 'block';
+                const primary = data.assessment_result.primary_diagnosis;
+                document.getElementById('primaryDiagnosisContent').innerHTML = `
+                    <div class="diagnosis-item">
+                        <h6>${primary.name}</h6>
+                        <p class="mb-1"><strong>Code:</strong> ${primary.code}</p>
+                        <p class="mb-1"><strong>Confidence:</strong> ${(primary.confidence * 100).toFixed(1)}%</p>
+                        <p class="mb-0"><strong>Probability:</strong> ${(primary.probability * 100).toFixed(1)}%</p>
+                    </div>
+                `;
+            }
+            
+            // Differential diagnoses
+            if (data.assessment_result.differential_diagnoses && data.assessment_result.differential_diagnoses.length > 0) {
+                document.getElementById('differentialDiagnoses').style.display = 'block';
+                let differentialHtml = '';
+                data.assessment_result.differential_diagnoses.forEach((diagnosis, index) => {
+                    differentialHtml += `
+                        <div class="diagnosis-item">
+                            <h6>${index + 1}. ${diagnosis.name}</h6>
+                            <p class="mb-1"><strong>Code:</strong> ${diagnosis.code}</p>
+                            <p class="mb-1"><strong>Confidence:</strong> ${(diagnosis.confidence * 100).toFixed(1)}%</p>
+                            <p class="mb-0"><strong>Probability:</strong> ${(diagnosis.probability * 100).toFixed(1)}%</p>
+                        </div>
+                    `;
+                });
+                document.getElementById('differentialDiagnosesContent').innerHTML = differentialHtml;
+            }
+            
+            // Clinical findings
+            if (data.assessment_result.clinical_findings && data.assessment_result.clinical_findings.length > 0) {
+                document.getElementById('clinicalFindings').style.display = 'block';
+                let findingsHtml = '';
+                data.assessment_result.clinical_findings.forEach(finding => {
+                    findingsHtml += `
+                        <div class="finding-item">
+                            <strong>${finding.finding_type}:</strong> ${finding.description}
+                            <br><small class="text-muted">Confidence: ${(finding.confidence * 100).toFixed(1)}% | Source: ${finding.source}</small>
+                        </div>
+                    `;
+                });
+                document.getElementById('clinicalFindingsContent').innerHTML = findingsHtml;
+            }
+            
+            // Recommendations
+            if (data.recommendations && data.recommendations.length > 0) {
+                document.getElementById('recommendations').style.display = 'block';
+                let recommendationsHtml = '<ul class="list-group list-group-flush">';
+                data.recommendations.forEach(rec => {
+                    recommendationsHtml += `<li class="list-group-item">${rec}</li>`;
+                });
+                recommendationsHtml += '</ul>';
+                document.getElementById('recommendationsContent').innerHTML = recommendationsHtml;
+            }
+            
+            // Explainable AI
+            if (data.explainable_ai) {
+                document.getElementById('explainableAI').style.display = 'block';
+                let explainableHtml = '';
+                
+                if (data.explainable_ai.decision_path) {
+                    explainableHtml += '<h6>Decision Path:</h6><ol>';
+                    data.explainable_ai.decision_path.forEach(step => {
+                        explainableHtml += `<li>${step}</li>`;
+                    });
+                    explainableHtml += '</ol>';
+                }
+                
+                if (data.explainable_ai.key_factors) {
+                    explainableHtml += '<h6>Key Factors:</h6><ul>';
+                    data.explainable_ai.key_factors.forEach(factor => {
+                        explainableHtml += `<li>${factor}</li>`;
+                    });
+                    explainableHtml += '</ul>';
+                }
+                
+                document.getElementById('explainableAIContent').innerHTML = explainableHtml;
+            }
+        }
+    </script>
+</body>
+</html>
