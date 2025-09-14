@@ -11,6 +11,7 @@ BASE_URL = "http://88.248.132.97:3333/lisapi/api/v1/Radiology/getPatientPacsImag
 path = "received_data/patient_id_unknown/sample_patient.json"  # Default; replace with a real path if available
 info = ""
 image = ""
+ida = 0
 
 def get_patient(patient_id: int):
     """Fetch PACS image info for a given patient ID"""

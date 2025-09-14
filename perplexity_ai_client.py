@@ -3,9 +3,32 @@ import json
 import base64
 import os
 from typing import Dict, Any
-
+import request_create_json as r
 from dotenv import load_dotenv
 load_dotenv()
+
+def read_patient_history(patient_id: int) -> str:
+    """
+    Read patient history from the history file.
+    
+    Args:
+        patient_id (int): The patient ID
+        
+    Returns:
+        str: Patient history content or empty string if file not found
+    """
+    history_file_path = f"received_data/patient_id_{patient_id}/patient_id_{patient_id}_history.txt"
+    
+    try:
+        if os.path.exists(history_file_path):
+            with open(history_file_path, "r", encoding="utf-8") as f:
+                return f.read().strip()
+        else:
+            print(f"History file not found: {history_file_path}")
+            return ""
+    except Exception as e:
+        print(f"Error reading history file: {e}")
+        return ""
 
 def send_to_perplexity_ai(input_dict: Dict[str, Any], image_path: str) -> str:
     """
@@ -40,7 +63,16 @@ def send_to_perplexity_ai(input_dict: Dict[str, Any], image_path: str) -> str:
     except Exception as e:
         raise ValueError(f"Error reading image file: {e}")
 
-    # Prepare the request payload with the input_dict directly as the prompt
+    # Read patient history
+    patient_history = read_patient_history(r.ida)
+    
+    # Prepare the complete prompt including patient history
+    complete_prompt = {
+        **input_dict,
+        "patient_history": patient_history
+    }
+
+    # Prepare the request payload with the complete prompt including history
     payload = {
         "model": "sonar",  # Perplexity's lowest cost model
         "messages": [
@@ -49,7 +81,7 @@ def send_to_perplexity_ai(input_dict: Dict[str, Any], image_path: str) -> str:
                 "content": [
                     {
                         "type": "text",
-                        "text": json.dumps(input_dict, indent=2)  # Send the prompt dictionary as JSON
+                        "text": json.dumps(complete_prompt, indent=2)  # Send the complete prompt with history
                     },
                     {
                         "type": "image_url",
