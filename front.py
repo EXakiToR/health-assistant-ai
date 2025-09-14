@@ -127,16 +127,14 @@ class HealthcareApp(tb.Window):
             widget.destroy()
 
         self.xrays = []
-        for study in self.patient_data.get("radiologyImages", []):
-            for file_info in study.get("files", []):
-                file_name = file_info.get("fileName", "unknown.png")
-                self.xrays.append((file_name, file_info))
+
 
         if self.patient_folder and os.path.exists(self.patient_folder):
             for file_name in os.listdir(self.patient_folder):
                 if file_name.lower().endswith(".png"):
                     file_path = os.path.join(self.patient_folder, file_name)
                     self.xrays.append((file_name, {"filePath": file_path}))
+
 
         if self.xrays:
             tb.Label(self.scrollable_frame, text="Select X-ray (click on an image):", bootstyle=PRIMARY).pack(pady=5)
