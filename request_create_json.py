@@ -6,12 +6,16 @@ from make_png_from_dicom import change_to_png
 
 BASE_URL = "http://88.248.132.97:3333/lisapi/api/v1/Radiology/getPatientPacsImages"
 
+
 # Set a default path to a sample JSON file (update this path as needed)
 path = "received_data/patient_id_unknown/sample_patient.json"  # Default; replace with a real path if available
-patient_id = 0
+info = ""
+image = ""
 
 def get_patient(patient_id: int):
     """Fetch PACS image info for a given patient ID"""
+    global ida
+    ida = patient_id
     url = f"{BASE_URL}?patientId={patient_id}"
     response = requests.get(url)
     response.raise_for_status()
@@ -37,7 +41,13 @@ def save_patient_data(data: dict, base_folder="received_data"):
     # Update the global path to the new JSON file
     json_filename = f"{name}_{surname}_id_{pid}.json"
     json_path = os.path.join(patient_folder, json_filename)
+    print("A: ", patient_folder, " ", json_filename, " ", json_path)
+    
+    global path
     path = json_path  # Update global path
+
+    global image
+    image = patient_folder
 
     # --- Save JSON ---
     with open(json_path, "w", encoding="utf-8") as f:
@@ -88,6 +98,9 @@ def setup(path_to_instructions="first_text.txt"):
     try:
         with open(path_to_instructions, "r", encoding="utf-8") as f:
             prompt = f.read().strip()
+        global info
+
+        info = prompt
         return prompt
     except FileNotFoundError:
         raise FileNotFoundError("")

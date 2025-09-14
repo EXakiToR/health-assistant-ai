@@ -8,8 +8,10 @@ from PIL import Image, ImageTk
 from pathlib import Path
 import pyperclip  # pip install pyperclip
 
-# Import backend functions
-from request_create_json import get_patient, save_patient_data
+selected_xray_global = None
+
+import request_create_json as r
+import perplexity_ai_client as pr
 
 
 def decode_image(file_info):
@@ -42,6 +44,9 @@ class HealthcareApp(tb.Window):
         self.image_thumbnails = {}
         self.selected_xray = None
         self.patient_folder = None
+        
+        def get_selected_xray(self):
+            return self.selected_xray
 
         # Patient ID input
         tb.Label(self, text="Enter Patient ID:", bootstyle=INFO).pack(pady=10)
@@ -95,8 +100,8 @@ class HealthcareApp(tb.Window):
             return
 
         try:
-            self.patient_data = get_patient(pid)
-            self.patient_folder = save_patient_data(self.patient_data)
+            self.patient_data = r.get_patient(pid)
+            self.patient_folder = r.save_patient_data(self.patient_data)
             self.build_workflow()
             messagebox.showinfo("Success", "Patient data retrieved.")
         except Exception as e:
@@ -232,6 +237,9 @@ class HealthcareApp(tb.Window):
             self.xray_preview.bind("<Button-1>", self.open_full_image)
             self.selected_xray = selected_file
 
+            global selected_xray_global
+            selected_xray_global = self.selected_xray
+
     def open_full_image(self, event=None):
         if not hasattr(self, "preview_img") or self.preview_img is None:
             return
@@ -279,22 +287,32 @@ class HealthcareApp(tb.Window):
     def submit_data(self):
         assumptions = self.entry_assumptions.get("1.0", "end").strip()
         questions = self.entry_questions.get("1.0", "end").strip()
-        
-        print(assumptions, "           ", questions, "            ", self.selected_xray)
-        selected_file = self.selected_xray
 
         if not assumptions:
             messagebox.showwarning("Input Error", "Please provide assumptions/diagnosis")
             return
 
+        selected_file = self.selected_xray
+
+        if not selected_file:
+            messagebox.showwarning("Input Error", "Please select an X-ray")
+            return
+        
+        image_path = os.path.join(r.image, selected_file)
+
+        prompt = {
+            "requirements": r.instructions,
+            "patient_data": r.analyze_json(),
+            "opinion": assumptions,
+            "question": questions
+        }
+
         try:
-            # Placeholder AI response
-            ai_response = f"AI Analysis for {selected_file}:\nBased on your assumptions: {assumptions}\nAnd your questions: {questions}\n\nDiagnosis suggestion: This is a placeholder."
+            ai_response = pr.send_to_perplexity_ai(prompt, image_path)
             self.output_text.delete("1.0", "end")
             self.output_text.insert("1.0", ai_response)
         except Exception as e:
-            messagebox.showerror("Error", f"Failed to process data: {e}")
-    
+            messagebox.showerror("Error", str(e))
 
 if __name__ == "__main__":
     app = HealthcareApp()
