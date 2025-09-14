@@ -1,0 +1,21 @@
+{
+  "patient": {
+    "id": 14,
+    "name": "Patient 14",
+    "surname": "Test 14",
+    "gender": "Male",
+    "birthDate": "1990-01-25T00:00:00"
+  },
+  "anamnesis": "Comminuted fracture of calcaneus body.",
+  "diagnoses": [
+    {
+      "code": "S92.0",
+      "name": "Fracture of calcaneus"
+    }
+  ],
+  "radiologyImages": [
+    {
+      "processName": "Foot X-ray, lateral and axial"
+    }
+  ]
+}

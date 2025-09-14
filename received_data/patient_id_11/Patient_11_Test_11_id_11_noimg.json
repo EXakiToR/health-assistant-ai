@@ -1,0 +1,21 @@
+{
+  "patient": {
+    "id": 11,
+    "name": "Patient 11",
+    "surname": "Test 11",
+    "gender": "Male",
+    "birthDate": "1997-11-03T00:00:00"
+  },
+  "anamnesis": "Consolidation in the right lower lobe, consistent with bacterial pneumonia.",
+  "diagnoses": [
+    {
+      "code": "S42.0",
+      "name": "Fracture of clavicle"
+    }
+  ],
+  "radiologyImages": [
+    {
+      "processName": "Shoulder X-ray"
+    }
+  ]
+}

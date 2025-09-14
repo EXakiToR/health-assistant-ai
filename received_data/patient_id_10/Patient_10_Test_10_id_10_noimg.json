@@ -1,0 +1,21 @@
+{
+  "patient": {
+    "id": 10,
+    "name": "Patient 10",
+    "surname": "Test 10",
+    "gender": "Male",
+    "birthDate": "1980-11-10T00:00:00"
+  },
+  "anamnesis": "Consolidation in the right lower lobe, consistent with bacterial pneumonia.",
+  "diagnoses": [
+    {
+      "code": "J18.9",
+      "name": "Pneumonia, unspecified organism"
+    }
+  ],
+  "radiologyImages": [
+    {
+      "processName": "Chest X-ray – Pneumonia"
+    }
+  ]
+}

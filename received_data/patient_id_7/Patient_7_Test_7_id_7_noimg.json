@@ -1,0 +1,21 @@
+{
+  "patient": {
+    "id": 7,
+    "name": "Patient 7",
+    "surname": "Test 7",
+    "gender": "Male",
+    "birthDate": "1960-11-10T00:00:00"
+  },
+  "anamnesis": "65-year-old male with persistent cough, weight loss, and shortness of breath for 2 weeks.",
+  "diagnoses": [
+    {
+      "code": "C34.9",
+      "name": "Malignant neoplasm of lung, unspecified"
+    }
+  ],
+  "radiologyImages": [
+    {
+      "processName": "Chest X-ray – Lung tumor"
+    }
+  ]
+}

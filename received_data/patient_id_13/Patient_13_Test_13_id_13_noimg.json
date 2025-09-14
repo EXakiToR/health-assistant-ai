@@ -1,0 +1,21 @@
+{
+  "patient": {
+    "id": 13,
+    "name": "Patient 13",
+    "surname": "Test 13",
+    "gender": "Male",
+    "birthDate": "1955-01-25T00:00:00"
+  },
+  "anamnesis": "Transverse fracture with minimal angulation.",
+  "diagnoses": [
+    {
+      "code": "S82.2",
+      "name": "Fracture of shaft of tibia"
+    }
+  ],
+  "radiologyImages": [
+    {
+      "processName": "Leg X-ray, AP and lateral"
+    }
+  ]
+}

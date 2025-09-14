@@ -1,0 +1,21 @@
+{
+  "patient": {
+    "id": 8,
+    "name": "Patient 8",
+    "surname": "Test 8",
+    "gender": "Female",
+    "birthDate": "1955-11-10T00:00:00"
+  },
+  "anamnesis": "Hyperdense intra-axial collection in the right cerebral hemisphere consistent with acute hemorrhage.",
+  "diagnoses": [
+    {
+      "code": "I61.9",
+      "name": "Intracerebral hemorrhage, unspecified"
+    }
+  ],
+  "radiologyImages": [
+    {
+      "processName": "Brain CT (Non-contrast)"
+    }
+  ]
+}

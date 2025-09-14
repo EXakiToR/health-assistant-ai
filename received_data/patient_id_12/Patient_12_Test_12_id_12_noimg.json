@@ -1,0 +1,21 @@
+{
+  "patient": {
+    "id": 12,
+    "name": "Patient 12",
+    "surname": "Test 12",
+    "gender": "Female",
+    "birthDate": "1960-01-25T00:00:00"
+  },
+  "anamnesis": "Non-displaced femoral neck fracture, risk of avascular necrosis.",
+  "diagnoses": [
+    {
+      "code": "S72.0",
+      "name": "Fracture of neck of femur"
+    }
+  ],
+  "radiologyImages": [
+    {
+      "processName": "Hip X-ray, AP and lateral"
+    }
+  ]
+}

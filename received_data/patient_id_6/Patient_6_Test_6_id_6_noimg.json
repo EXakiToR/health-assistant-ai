@@ -1,0 +1,21 @@
+{
+  "patient": {
+    "id": 6,
+    "name": "Patient 6",
+    "surname": "Test 6",
+    "gender": "Male",
+    "birthDate": "1994-11-10T00:00:00"
+  },
+  "anamnesis": "The patient sustained a wrist injury after a fall from a low height.",
+  "diagnoses": [
+    {
+      "code": "W18.39",
+      "name": "Other fall on same level"
+    }
+  ],
+  "radiologyImages": [
+    {
+      "processName": "Bilateral wrist X-ray, two views"
+    }
+  ]
+}

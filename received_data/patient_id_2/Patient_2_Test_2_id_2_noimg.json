@@ -1,0 +1,30 @@
+{
+  "patient": {
+    "id": 2,
+    "name": "Patient 2",
+    "surname": "Test 2",
+    "gender": "Female",
+    "birthDate": "1980-01-25T00:00:00"
+  },
+  "anamnesis": "deneme anamnesis",
+  "diagnoses": [
+    {
+      "code": "I10",
+      "name": "test1"
+    },
+    {
+      "code": "Z00",
+      "name": "test2"
+    },
+    {
+      "code": "Z01",
+      "name": "test3"
+    }
+  ],
+  "radiologyImages": [
+    {
+      "processName": "Chest X-ray"
+      
+    }
+  ]
+}

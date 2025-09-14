@@ -1,0 +1,21 @@
+{
+  "patient": {
+    "id": 9,
+    "name": "Patient 9",
+    "surname": "Test 9",
+    "gender": "Male",
+    "birthDate": "1975-11-10T00:00:00"
+  },
+  "anamnesis": "Highlighted hemorrhage area visible in right hemisphere.",
+  "diagnoses": [
+    {
+      "code": "I61.9",
+      "name": "Intracerebral hemorrhage, unspecified"
+    }
+  ],
+  "radiologyImages": [
+    {
+      "processName": "Brain CT (Non-contrast)"
+    }
+  ]
+}
